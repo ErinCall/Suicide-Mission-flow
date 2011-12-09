@@ -31,8 +31,7 @@ def weapons_check():
         state.kill_one_of(weapons_vulnerables, 'Cannon check')
 
 def vents():
-    state.confirm_alive('Vents')
-    state.confirm_alive('Fireteam 1')
+    state.confirm_alive_and_distinct(('Vents', 'Fireteam 1'))
 
     if config['Vents'] not in ('Tali', 'Legion', 'Kasumi') \
     or not state.role_is_loyal('Vents') \
@@ -41,10 +40,8 @@ def vents():
         state.kill_role('Vents')
 
 def long_walk():
-    state.confirm_alive('Biotic')
-    state.confirm_alive('Long walk party 1')
-    state.confirm_alive('Long walk party 2')
-    state.confirm_alive('Fireteam 2')
+    state.confirm_alive_and_distinct(('Biotic', 'Long walk party 1',
+                                'Long walk party 2', 'Fireteam 2'))
     if config['Biotic'] not in ('Jack', 'Morinth', 'Samara') \
     or not state.role_is_loyal('Biotic'):
         party_members = (config['Long walk party 1'], config['Long walk party 2'])
@@ -78,8 +75,9 @@ def the_escort():
         state.misc_state.append('All crewmen dead (including Chakwas)')
 
 def final_fight():
-    for party_member in ('Final fight party 1', 'Final fight party 2'):
-        state.confirm_alive(party_member)
+    roles = ('Final fight party 1', 'Final fight party 2')
+    state.confirm_alive_and_distinct(roles)
+    for party_member in roles:
         if not state.role_is_loyal(party_member):
             state.kill_role(party_member)
 

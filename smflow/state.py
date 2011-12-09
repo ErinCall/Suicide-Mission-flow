@@ -11,6 +11,22 @@ class State():
                     'character': self.config[role_name],
                     'role_name': role_name})
 
+    def confirm_alive_and_distinct(self, roles):
+        for role_name in roles:
+            self.confirm_alive(role_name)
+        performed_roles = {}
+        for role in roles:
+            #c'mon just let me have ||=, just let me have ti
+            performed_roles[self.config[role]] = \
+                        performed_roles.get(self.config[role],[])
+            performed_roles[self.config[role]].append(role)
+        for character in performed_roles:
+            if len(performed_roles[character]) > 1:
+                raise Exception('%(character)s has been assigned '
+                        'multiple roles: %(roles)s' % {
+                        'character': character,
+                        'roles': performed_roles[character]})
+
     def role_is_loyal(self, role_name):
         return self.char_is_loyal(self.config[role_name])
     def char_is_loyal(self, character):
