@@ -1,39 +1,13 @@
 #!/usr/bin/env python
 
-crew = {
-    'Garrus':  1, #loyalable
-    'Grunt':   0,
-    'Jack':    1, #loyalable
-    'Jacob':   1, #loyalable
-    'Kasumi':  1, #loyalable
-    'Legion':  0,
-    'Miranda': 1,
-    'Morinth': 2,
-    'Mordin':  1, #loyalable
-    'Tali':    1,
-    'Thane':   1,
-    'Zaeed':   1,
-}
+import yaml
+crew_file = open('crew.yaml')
+crew = yaml.load(crew_file.read())
 
-config = {
-    'Armor upgrade': False,
-    'Shield upgrade': False,
-    'Cannon upgrade': False,
+config_file = open('config.yaml')
+config = yaml.load(config_file.read())
 
-    'Vents': 'Jacob',
-    'Fireteam 1': 'Miranda',
 
-    'Biotic': 'Miranda',
-    'Fireteam 2': 'Mordin',
-    'Crew escort': None,
-    'Long walk party 1': 'Morinth',
-    'Long walk party 2': 'Garrus',
-
-    'Final fight party 1': 'Morinth',
-    'Final fight party 2': 'Miranda',
-
-    'Delay missions': 4,
-}
 other_state = []
 
 defenders = {

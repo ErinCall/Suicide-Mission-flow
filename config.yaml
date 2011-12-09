@@ -1,0 +1,20 @@
+#pre-landing
+'Armor upgrade': False
+'Shield upgrade': False
+'Cannon upgrade': False
+
+#vents assault
+'Vents': 'Jacob'
+'Fireteam 1': 'Miranda'
+
+#the long walk
+'Biotic': 'Miranda'
+'Fireteam 2': 'Mordin'
+'Crew escort': null
+'Long walk party 1': 'Morinth'
+'Long walk party 2': 'Garrus'
+'Final fight party 1': 'Morinth'
+'Final fight party 2': 'Miranda'
+
+#missions performed between IFF installation and hitting the O3 relay
+'Delay missions': 4
