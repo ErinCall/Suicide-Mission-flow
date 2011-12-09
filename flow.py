@@ -45,7 +45,7 @@ def long_walk():
     util.confirm_alive('Long walk party 1')
     util.confirm_alive('Long walk party 2')
     util.confirm_alive('Fireteam 2')
-    if config['Biotic'] not in ('Jack', 'Morinth') \
+    if config['Biotic'] not in ('Jack', 'Morinth', 'Samara') \
     or not util.role_is_loyal('Biotic'):
         party_members = (config['Long walk party 1'], config['Long walk party 2'])
         util.kill_one_of(long_walk_vulnerables, 'Long-walk party member',
