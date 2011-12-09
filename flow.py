@@ -13,62 +13,62 @@ from smflow import (
 crew_file = open('crew.yaml')
 crew = yaml.load(crew_file.read())
 
-config_file = open('config.yaml')
-config = yaml.load(config_file.read())
+choices = open('choices.yaml')
+choices = yaml.load(choices.read())
 
-state = smflow.state.State(crew, config)
+state = smflow.state.State(crew, choices)
 
 def armor_check():
-    if not config['Armor upgrade']:
+    if not choices['Armor upgrade']:
         state.kill_char('Jack', 'Armor check')
 
 def shield_check():
-    if not config['Shield upgrade']:
+    if not choices['Shield upgrade']:
         state.kill_one_of(shield_vulnerables, 'Shield check')
 
 def weapons_check():
-    if not config['Cannon upgrade']:
+    if not choices['Cannon upgrade']:
         state.kill_one_of(weapons_vulnerables, 'Cannon check')
 
 def vents():
     state.confirm_alive_and_distinct(('Vents', 'Fireteam 1'))
 
-    if config['Vents'] not in ('Tali', 'Legion', 'Kasumi') \
+    if choices['Vents'] not in ('Tali', 'Legion', 'Kasumi') \
     or not state.role_is_loyal('Vents') \
-    or config['Fireteam 1'] not in ('Miranda', 'Jacob', 'Garrus') \
+    or choices['Fireteam 1'] not in ('Miranda', 'Jacob', 'Garrus') \
     or not state.role_is_loyal('Fireteam 1'):
         state.kill_role('Vents')
 
 def long_walk():
     state.confirm_alive_and_distinct(('Biotic', 'Long walk party 1',
                                 'Long walk party 2', 'Fireteam 2'))
-    if config['Biotic'] not in ('Jack', 'Morinth', 'Samara') \
+    if choices['Biotic'] not in ('Jack', 'Morinth', 'Samara') \
     or not state.role_is_loyal('Biotic'):
-        party_members = (config['Long walk party 1'], config['Long walk party 2'])
+        party_members = (choices['Long walk party 1'], choices['Long walk party 2'])
         state.kill_one_of(long_walk_vulnerables, 'Long-walk party member',
                                 eligible=lambda x: x in party_members)
 
-    if config['Fireteam 2'] != 'Miranda' \
-    and (config['Fireteam 2'] not in ('Jacob', 'Garrus') \
+    if choices['Fireteam 2'] != 'Miranda' \
+    and (choices['Fireteam 2'] not in ('Jacob', 'Garrus') \
                         or not state.role_is_loyal['Fireteam 2']):
         state.kill_role('Fireteam 2')
 
 def the_crew():
-    if config['Delay missions'] == 0:
+    if choices['Delay missions'] == 0:
             state.misc_state.append('All crew survive')
-    elif config['Delay missions'] <= 3:
+    elif choices['Delay missions'] <= 3:
             state.misc_state.append('Half the crew survives')
     else:
         state.misc_state.append('Chakwas survives; all other crewmen dead')
 
 def the_escort():
-    if config['Crew escort']:
+    if choices['Crew escort']:
         state.confirm_alive('Crew escort')
     # we'll "kill" them here to ensure they aren't used elsewhere, then stick them
     # in misc_state if they're loyal and can survive
         state.kill_role('Crew escort')
         if state.role_is_loyal('Crew escort'):
-            state.misc_state.append(config['Crew escort'])
+            state.misc_state.append(choices['Crew escort'])
             state.misc_state.append('All crew survive')
     else:
         state.misc_state = state.misc_state[0:-1]
@@ -82,8 +82,8 @@ def final_fight():
             state.kill_role(party_member)
 
 def hold_the_line():
-    del defenders[config['Final fight party 1']]
-    del defenders[config['Final fight party 2']]
+    del defenders[choices['Final fight party 1']]
+    del defenders[choices['Final fight party 2']]
     for defender in defenders.keys():
         if not crew[defender]: del defenders[defender]
 
