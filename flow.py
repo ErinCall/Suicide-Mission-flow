@@ -45,12 +45,10 @@ if not config['Cannon upgrade']:
 util.confirm_alive('Vents')
 util.confirm_alive('Fireteam 1')
 
-if config['Vents'] in ('Tali', 'Legion', 'Kasumi') \
-and util.role_is_loyal('Vents') \
-and config['Fireteam 1'] in ('Miranda', 'Jacob', 'Garrus') \
-and util.role_is_loyal('Fireteam 1'):
-    pass
-else:
+if config['Vents'] not in ('Tali', 'Legion', 'Kasumi') \
+or not util.role_is_loyal('Vents') \
+or config['Fireteam 1'] not in ('Miranda', 'Jacob', 'Garrus') \
+or not util.role_is_loyal('Fireteam 1'):
     util.kill_role('Vents')
 
 #The long walk
