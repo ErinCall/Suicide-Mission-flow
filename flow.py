@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
 import yaml
+import smflow.utils
 crew_file = open('crew.yaml')
 crew = yaml.load(crew_file.read())
 
 config_file = open('config.yaml')
 config = yaml.load(config_file.read())
 
+util = smflow.utils.Util(crew, config)
 
 other_state = []
 
@@ -25,69 +27,54 @@ defenders = {
     'Zaeed':   3,
 }
 
-def confirm_alive(role_name):
-    if not crew[config[role_name]]:
-        raise Exception('%(character)s is set to be your %(role_name)s '
-                'specialist, but is already dead' % {
-                'character': config[role_name], 'role_name': role_name})
-def role_is_loyal(role_name):
-    return char_is_loyal(config[role_name])
-def char_is_loyal(character):
-    return crew[character] > 1
-def kill_role(role_name):
-    kill_char(config[role_name], role_name)
-def kill_char(char, description):
-    #print 'killing %s (%s)' % (char, description)
-    crew[char] = 0
-
 #Armor check
 if not config['Armor upgrade']:
-    kill_char('Jack', 'Armor check')
+    util.kill_char('Jack', 'Armor check')
 
 #Shield check
 if not config['Shield upgrade']:
     for vuln in ('Kasumi', 'Legion', 'Tali', 'Thane', 'Garrus', 'Zaeed',
                                                     'Grunt', 'Morinth'):
         if crew[vuln]:
-            kill_char(vuln, 'Shield check')
+            util.kill_char(vuln, 'Shield check')
             break
 
 #weapons check
 if not config['Cannon upgrade']:
     for vuln in ('Thane', 'Garrus', 'Zaeed', 'Grunt', 'Jack', 'Morinth'):
         if crew[vuln]:
-            kill_char(vuln, 'Cannon check')
+            util.kill_char(vuln, 'Cannon check')
             break
 
 #The vents
-confirm_alive('Vents')
-confirm_alive('Fireteam 1')
+util.confirm_alive('Vents')
+util.confirm_alive('Fireteam 1')
 
 if config['Vents'] in ('Tali', 'Legion', 'Kasumi') \
-and role_is_loyal('Vents') \
+and util.role_is_loyal('Vents') \
 and config['Fireteam 1'] in ('Miranda', 'Jacob', 'Garrus') \
-and role_is_loyal('Fireteam 1'):
+and util.role_is_loyal('Fireteam 1'):
     pass
 else:
-    kill_role('Vents')
+    util.kill_role('Vents')
 
 #The long walk
-confirm_alive('Biotic')
-confirm_alive('Long walk party 1')
-confirm_alive('Long walk party 2')
-confirm_alive('Fireteam 2')
+util.confirm_alive('Biotic')
+util.confirm_alive('Long walk party 1')
+util.confirm_alive('Long walk party 2')
+util.confirm_alive('Fireteam 2')
 if config['Biotic'] not in ('Jack', 'Morinth') \
-or not role_is_loyal('Biotic'):
+or not util.role_is_loyal('Biotic'):
     vulnerable = ('Thane', 'Jack', 'Garrus', 'Legion', 'Grunt', 'Jacob',
                         'Mordin', 'Tali', 'Kasumi', 'Zaeed', 'Morinth')
     for vuln in vulnerable:
         if vuln in (config['Long walk party 1'], config['Long walk party 2']):
-            kill_char(vuln, 'long-walk party member')
+            util.kill_char(vuln, 'long-walk party member')
             break
 if config['Fireteam 2'] != 'Miranda' \
 and (config['Fireteam 2'] not in ('Jacob', 'Garrus') \
-                    or not role_is_loyal['Fireteam 2']):
-    kill_role('Fireteam 2')
+                    or not util.role_is_loyal['Fireteam 2']):
+    util.kill_role('Fireteam 2')
 
 #The crew
 if config['Delay missions'] == 0:
@@ -99,11 +86,11 @@ else:
 
 #The escort
 if config['Crew escort']:
-    confirm_alive('Crew escort')
+    util.confirm_alive('Crew escort')
 # we'll "kill" them here to ensure they aren't used elsewhere, then stick them
 # in other_state if they're loyal and can survive
-    kill_role('Crew escort')
-    if role_is_loyal('Crew escort'):
+    util.kill_role('Crew escort')
+    if util.role_is_loyal('Crew escort'):
         other_state.append(config['Crew escort'])
         other_state.append('All crew survive')
 else:
@@ -112,9 +99,9 @@ else:
 
 #The final fight
 for party_member in ('Final fight party 1', 'Final fight party 2'):
-    confirm_alive(party_member)
-    if not role_is_loyal(party_member):
-        kill_role(party_member)
+    util.confirm_alive(party_member)
+    if not util.role_is_loyal(party_member):
+        util.kill_role(party_member)
 
 #Hold the line
 del defenders[config['Final fight party 1']]
@@ -126,7 +113,7 @@ if defenders:
     total_strength = 0
     for defender in defenders:
         total_strength += defenders[defender]
-        if char_is_loyal(defender):
+        if util.char_is_loyal(defender):
             total_strength += 1
     avg_strength = float(total_strength)/len(defenders)
     deaths = 0
@@ -152,12 +139,12 @@ if defenders:
     vulnerability_order = ['Mordin', 'Tali', 'Kasumi', 'Jack', 'Miranda',
                             'Jacob', 'Garrus', 'Morinth', 'Legion', 'Thane',
                             'Zaeed', 'Grunt']
-    vulnerability = filter(lambda x: not char_is_loyal(x)
+    vulnerability = filter(lambda x: not util.char_is_loyal(x)
                                 and x in defenders, vulnerability_order)
-    vulnerability.extend(filter(lambda x: char_is_loyal(x)
+    vulnerability.extend(filter(lambda x: util.char_is_loyal(x)
                                 and x in defenders, vulnerability_order))
     while deaths > 0:
-        kill_char(vulnerability[0], 'Hold the line')
+        util.kill_char(vulnerability[0], 'Hold the line')
         vulnerability.remove(vulnerability[0])
         deaths -= 1
 
