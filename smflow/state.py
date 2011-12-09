@@ -1,8 +1,8 @@
-class Util():
+class State():
     def __init__(self, crew, config):
         self.crew = crew
         self.config = config
-        self.other_state = []
+        self.misc_state = []
 
     def confirm_alive(self, role_name):
         if not self.crew[self.config[role_name]]:
