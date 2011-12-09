@@ -2,6 +2,14 @@
 
 import yaml
 import smflow.utils
+from smflow import (
+    defenders,
+    shield_vulnerables,
+    weapons_vulnerables,
+    long_walk_vulnerables,
+    hold_the_line_vulnerables,
+)
+
 crew_file = open('crew.yaml')
 crew = yaml.load(crew_file.read())
 
@@ -10,34 +18,17 @@ config = yaml.load(config_file.read())
 
 util = smflow.utils.Util(crew, config)
 
-defenders = {
-    'Garrus':  3,
-    'Grunt':   3,
-    'Jack':    0,
-    'Jacob':   1,
-    'Kasumi':  0,
-    'Legion':  1,
-    'Miranda': 1,
-    'Morinth': 1,
-    'Mordin':  0,
-    'Tali':    0,
-    'Thane':   1,
-    'Zaeed':   3,
-}
-
 def armor_check():
     if not config['Armor upgrade']:
         util.kill_char('Jack', 'Armor check')
 
 def shield_check():
     if not config['Shield upgrade']:
-        util.kill_one_of(['Kasumi', 'Legion', 'Tali', 'Thane', 'Garrus',
-                        'Zaeed', 'Grunt', 'Morinth'], 'Shield check')
+        util.kill_one_of(shield_vulnerables, 'Shield check')
 
 def weapons_check():
     if not config['Cannon upgrade']:
-        util.kill_one_of(['Thane', 'Garrus', 'Zaeed', 'Grunt', 'Jack',
-                        'Morinth'], 'Cannon check')
+        util.kill_one_of(weapons_vulnerables, 'Cannon check')
 
 def vents():
     util.confirm_alive('Vents')
@@ -56,11 +47,9 @@ def long_walk():
     util.confirm_alive('Fireteam 2')
     if config['Biotic'] not in ('Jack', 'Morinth') \
     or not util.role_is_loyal('Biotic'):
-        vulnerables = ['Thane', 'Jack', 'Garrus', 'Legion', 'Grunt', 'Jacob',
-                            'Mordin', 'Tali', 'Kasumi', 'Zaeed', 'Morinth']
         party_members = (config['Long walk party 1'], config['Long walk party 2'])
-        util.kill_one_of(vulnerables, 'Long-walk party member', eligible=lambda x:
-                                                            x in party_members)
+        util.kill_one_of(long_walk_vulnerables, 'Long-walk party member',
+                                eligible=lambda x: x in party_members)
 
     if config['Fireteam 2'] != 'Miranda' \
     and (config['Fireteam 2'] not in ('Jacob', 'Garrus') \
@@ -127,13 +116,10 @@ def hold_the_line():
         elif len(defenders) == 1:
             if avg_strength < 2: deaths = 1
 
-        vulnerability_order = ['Mordin', 'Tali', 'Kasumi', 'Jack', 'Miranda',
-                                'Jacob', 'Garrus', 'Morinth', 'Legion', 'Thane',
-                                'Zaeed', 'Grunt']
         vulnerables = filter(lambda x: not util.char_is_loyal(x)
-                                    and x in defenders, vulnerability_order)
+                                and x in defenders, hold_the_line_vulnerables)
         vulnerables.extend(filter(lambda x: util.char_is_loyal(x)
-                                    and x in defenders, vulnerability_order))
+                                and x in defenders, hold_the_line_vulnerables))
         util.kill_n_of(vulnerables, deaths, 'Hold the line')
 
 armor_check()
