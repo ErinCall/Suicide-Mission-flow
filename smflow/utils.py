@@ -21,3 +21,15 @@ class Util():
         #print 'killing %s (%s)' % (char, description)
         self.crew[char] = 0
 
+
+    def kill_one_of(self, vulnerables, description, eligible=lambda x: True):
+        self.kill_n_of(vulnerables, 1, description, eligible)
+
+    def kill_n_of(self, vulnerables, deaths, description,
+                            eligible=lambda x:True):
+        while deaths > 0 and vulnerables:
+            candidate = vulnerables[0]
+            if eligible(candidate):
+                self.kill_char(candidate, description)
+                deaths -= 1
+            vulnerables.remove(vulnerables[0])

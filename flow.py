@@ -33,18 +33,13 @@ if not config['Armor upgrade']:
 
 #Shield check
 if not config['Shield upgrade']:
-    for vuln in ('Kasumi', 'Legion', 'Tali', 'Thane', 'Garrus', 'Zaeed',
-                                                    'Grunt', 'Morinth'):
-        if crew[vuln]:
-            util.kill_char(vuln, 'Shield check')
-            break
+    util.kill_one_of(['Kasumi', 'Legion', 'Tali', 'Thane', 'Garrus', 'Zaeed',
+                    'Grunt', 'Morinth'], 'Shield check')
 
 #weapons check
 if not config['Cannon upgrade']:
-    for vuln in ('Thane', 'Garrus', 'Zaeed', 'Grunt', 'Jack', 'Morinth'):
-        if crew[vuln]:
-            util.kill_char(vuln, 'Cannon check')
-            break
+    util.kill_one_of(['Thane', 'Garrus', 'Zaeed', 'Grunt', 'Jack', 'Morinth'],
+                    'Cannon check')
 
 #The vents
 util.confirm_alive('Vents')
@@ -65,12 +60,12 @@ util.confirm_alive('Long walk party 2')
 util.confirm_alive('Fireteam 2')
 if config['Biotic'] not in ('Jack', 'Morinth') \
 or not util.role_is_loyal('Biotic'):
-    vulnerable = ('Thane', 'Jack', 'Garrus', 'Legion', 'Grunt', 'Jacob',
-                        'Mordin', 'Tali', 'Kasumi', 'Zaeed', 'Morinth')
-    for vuln in vulnerable:
-        if vuln in (config['Long walk party 1'], config['Long walk party 2']):
-            util.kill_char(vuln, 'long-walk party member')
-            break
+    vulnerables = ['Thane', 'Jack', 'Garrus', 'Legion', 'Grunt', 'Jacob',
+                        'Mordin', 'Tali', 'Kasumi', 'Zaeed', 'Morinth']
+    party_members = (config['Long walk party 1'], config['Long walk party 2'])
+    util.kill_one_of(vulnerables, 'Long-walk party member', eligible=lambda x:
+                                                        x in party_members)
+
 if config['Fireteam 2'] != 'Miranda' \
 and (config['Fireteam 2'] not in ('Jacob', 'Garrus') \
                     or not util.role_is_loyal['Fireteam 2']):
@@ -139,14 +134,11 @@ if defenders:
     vulnerability_order = ['Mordin', 'Tali', 'Kasumi', 'Jack', 'Miranda',
                             'Jacob', 'Garrus', 'Morinth', 'Legion', 'Thane',
                             'Zaeed', 'Grunt']
-    vulnerability = filter(lambda x: not util.char_is_loyal(x)
+    vulnerables = filter(lambda x: not util.char_is_loyal(x)
                                 and x in defenders, vulnerability_order)
-    vulnerability.extend(filter(lambda x: util.char_is_loyal(x)
+    vulnerables.extend(filter(lambda x: util.char_is_loyal(x)
                                 and x in defenders, vulnerability_order))
-    while deaths > 0:
-        util.kill_char(vulnerability[0], 'Hold the line')
-        vulnerability.remove(vulnerability[0])
-        deaths -= 1
+    util.kill_n_of(vulnerables, deaths, 'Hold the line')
 
 
 survivors = filter(lambda m: crew[m], [m for m in crew])
