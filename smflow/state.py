@@ -46,7 +46,7 @@ class State():
                             eligible=lambda x:True):
         while deaths > 0 and vulnerables:
             candidate = vulnerables[0]
-            if eligible(candidate):
+            if self.crew[candidate] and eligible(candidate):
                 self.kill_char(candidate, description)
                 deaths -= 1
             vulnerables.remove(vulnerables[0])
